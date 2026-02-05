@@ -1,43 +1,38 @@
 import os
 import sys
-from google import genai
+# 必須使用最新的 SDK
+try:
+    from google import genai
+except ImportError:
+    print("❌ 錯誤: 找不到 google-genai 模組，請確認 pip install 是否成功。")
+    sys.exit(1)
 
 def run_automation():
-    # 這裡必須與 GitHub Secret 的名稱完全一致
+    # 這裡的名字必須與 GitHub Secret 名稱完全一致
     api_key = os.getenv("GEMINI_API_KEY")
     
     if not api_key:
-        print("❌ 錯誤: 找不到 GEMINI_API_KEY，請檢查 GitHub Secrets 設定。")
+        print("❌ 錯誤: GitHub Secrets 中的 GEMINI_API_KEY 是空的。")
         sys.exit(1)
 
-    # 初始化最新版本的 Google GenAI Client
-    client = genai.Client(api_key=api_key)
-
-    # 模擬任務：分析一段市場文字
-    task_type = "deep_analysis" 
-    market_data = "比特幣今日突破 10 萬美元，技術指標顯示強勢，但需注意回檔風險。"
-
-    # 邏輯分流：判斷任務類型
-    if "analysis" in task_type:
-        # 使用 Paid Tier 的 Pro 模型 (若已綁定信用卡)
-        model_name = "gemini-3-pro"
-        prompt = f"你是一個專業投資分析師，請評論此數據：{market_data}"
-    else:
-        # 簡單任務使用 Flash 模型
-        model_name = "gemini-3-flash"
-        prompt = f"請摘要此數據：{market_data}"
-
-    print(f"🚀 啟動任務: 使用 {model_name}")
-
     try:
+        # 初始化 Client
+        client = genai.Client(api_key=api_key)
+        
+        # 這裡設定為 Pro 模型 (Paid Tier)
+        # 如果您想省錢，可以改為 "gemini-3-flash"
+        model_name = "gemini-3-pro"
+        
         response = client.models.generate_content(
             model=model_name,
-            contents=prompt
+            contents="這是一則自動化測試。請回答：系統連線成功。"
         )
-        print("✅ Gemini 分析完成：")
-        print(response.text)
+        
+        print(f"✅ 使用模型: {model_name}")
+        print(f"🤖 AI 回應: {response.text}")
+
     except Exception as e:
-        print(f"❌ API 呼叫失敗: {e}")
+        print(f"❌ 執行發生異常: {str(e)}")
         sys.exit(1)
 
 if __name__ == "__main__":
