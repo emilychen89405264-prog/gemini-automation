@@ -15,13 +15,12 @@ def run_automation():
         print("❌ 錯誤: GitHub Secrets 中的 GEMINI_API_KEY 是空的。")
         sys.exit(1)
 
-    try:
+try:
         # 初始化 Client
         client = genai.Client(api_key=api_key)
         
-        # 這裡設定為 Pro 模型 (Paid Tier)
-        # 如果您想省錢，可以改為 "gemini-3-flash"
-        model_name = "gemini-3-pro"
+        # 修正這裡：改用目前 API 支援的正確名稱
+        model_name = "gemini-1.5-pro" 
         
         response = client.models.generate_content(
             model=model_name,
