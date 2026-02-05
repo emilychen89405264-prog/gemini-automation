@@ -12,21 +12,27 @@ def run_automation():
     try:
         client = genai.Client(api_key=api_key)
         
-        # 改用 Flash 模型，這是目前 v1beta 最穩定的模型代號
-        # 如果 1.5-flash 還不行，這代表您的 API Key 可能需要重新產生
-        model_name = "gemini-1.5-flash"
+        # 嘗試使用兩種可能的名稱格式 (方案 A)
+        model_id = "gemini-1.5-flash" 
+        
+        print(f"正在嘗試連線模型: {model_id}...")
         
         response = client.models.generate_content(
-            model=model_name,
-            contents="連線測試，請回覆：OK"
+            model=model_id,
+            contents="測試連線，請回答 OK。"
         )
         
-        print(f"✅ 成功連線！使用模型: {model_name}")
-        print(f"🤖 AI 回應: {response.text}")
+        print(f"✅ 成功！AI 回應: {response.text}")
 
     except Exception as e:
-        print(f"❌ 執行發生異常: {str(e)}")
-        # 如果還是 404，印出目前的模型清單供除錯
+        print(f"❌ 發生異常: {str(e)}")
+        print("\n--- 正在為您查詢目前 API Key 支援的所有模型清單 ---")
+        try:
+            # 這段會列出你這把 Key 真正能用的模型名稱
+            for m in client.models.list():
+                print(f"可用模型: {m.name} (支援方法: {m.supported_methods})")
+        except:
+            print("無法取得模型清單。")
         sys.exit(1)
 
 if __name__ == "__main__":
