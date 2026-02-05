@@ -1,0 +1,33 @@
+name: Gemini AI Automation
+
+on:
+  # 觸發條件 1: 定期執行 (例如每小時跑一次)
+  schedule:
+    - cron: '0 * * * *' 
+  # 觸發條件 2: 手動按按鈕執行
+  workflow_dispatch:
+
+jobs:
+  build_and_run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 檢出程式碼
+        uses: actions/checkout@v4
+
+      - name: 設定 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 安裝 Gemini SDK
+        run: |
+          pip install -U google-genai
+
+      - name: 執行自動化腳本
+        env:
+          # 將保險箱裡的 Secret 倒出來給 Python 使用
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # 如果你有 Notion，也記得在這裡加上 Secret
+          # NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: python gemini_automation.py
