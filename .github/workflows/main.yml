@@ -1,28 +1,30 @@
 name: Gemini AI Automation
 
 on:
-  schedule:
-    - cron: '0 0 * * *' # 每天 UTC 00:00 執行
-  workflow_dispatch:      # 讓您可以手動按「Run workflow」按鈕
+  workflow_dispatch:      # 務必保留這行，才能手動按按鈕測試
 
 jobs:
   build_and_run:
     runs-on: ubuntu-latest
+    # 設定權限，這能避免很多莫名其妙的 403 錯誤
+    permissions:
+      contents: write
     steps:
-      - name: 檢出代碼
+      - name: 1. 複製程式碼到虛擬機
         uses: actions/checkout@v4
 
-      - name: 設定 Python 3.10
+      - name: 2. 安裝 Python 環境
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: 安裝 Gemini SDK
+      - name: 3. 強制安裝最新 SDK
         run: |
+          python -m pip install --upgrade pip
           pip install -U google-genai
 
-      - name: 執行 Python 腳本
+      - name: 4. 執行腳本
         env:
-          # 最關鍵：這行把 Secret 注入環境變數
+          # 這裡的 secrets. 名稱必須與您在 Settings 設定的一模一樣
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python gemini_automation.py
